@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: BB-02_Create_test_tables
+      author: Oleksii Skachkov
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_users_id
+              - column:
+                  name: name
+                  type: varchar(50)
+              - column:
+                  name: email
+                  type: varchar(50)
+        - createTable:
+            tableName: addresses
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_addresses_id
+              - column:
+                  name: city
+                  type: varchar(50)
+              - column:
+                  name: street
+                  type: varchar(50)
