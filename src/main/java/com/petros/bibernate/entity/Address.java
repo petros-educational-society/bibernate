@@ -10,7 +10,7 @@ import lombok.Data;
 @Table("addresses")
 public class Address {
     @Id
-    private Integer id;
+    private Long id;
     private String city;
     private String street;
 }

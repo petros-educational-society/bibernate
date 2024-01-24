@@ -10,7 +10,7 @@ import lombok.Data;
 @Table("users")
 public class User {
     @Id
-    private Integer id;
+    private Long id;
     private String name;
     private String email;
 }
