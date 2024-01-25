@@ -4,4 +4,4 @@
 
 1. Clone project
 2. Create local postgresql db. Use credentials from /config/AppConfig or change here credentials on yours
-3. Run Bibernate - it will create test tables in DB with test data
+3. Run demo/DemoApp - it will create test tables in DB with test data

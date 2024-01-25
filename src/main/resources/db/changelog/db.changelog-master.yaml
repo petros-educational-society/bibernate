@@ -1,5 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: db/changelog/BB-02_Create_test_tables.yml
-  - include:
-      file: db/changelog/BB-02_Fill_test_data.yml

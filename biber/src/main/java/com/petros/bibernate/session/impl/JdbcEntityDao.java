@@ -17,7 +17,7 @@ import static com.petros.bibernate.session.util.EntityUtil.resolveColumnName;
 import static com.petros.bibernate.session.util.EntityUtil.resolveTableName;
 
 @RequiredArgsConstructor
-public class EntityManager {
+public class JdbcEntityDao {
 
     private final String SELECT_FROM_TABLE_BY_COLUMN = "select * from %s where %s = ?;";
 

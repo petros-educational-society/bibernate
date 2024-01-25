@@ -7,15 +7,15 @@ import javax.sql.DataSource;
 
 public class SessionImpl implements Session {
 
-    private final EntityManager entityManager;
+    private final JdbcEntityDao jdbcEntityDao;
 
     public SessionImpl(DataSource dataSource) {
-        this.entityManager = new EntityManager(dataSource);
+        this.jdbcEntityDao = new JdbcEntityDao(dataSource);
     }
 
     @Override
     @SneakyThrows
     public <T> T find(Class<T> entityType, Object id) {
-        return entityManager.findById(entityType, id);
+        return jdbcEntityDao.findById(entityType, id);
     }
 }

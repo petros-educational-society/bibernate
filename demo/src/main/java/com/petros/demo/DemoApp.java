@@ -1,4 +1,4 @@
-package com.petros.bibernate;
+package com.petros.demo;
 
 import com.petros.bibernate.entity.Address;
 import com.petros.bibernate.entity.User;
@@ -15,12 +15,13 @@ import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 import javax.sql.DataSource;
+
 import java.sql.SQLException;
 
 import static com.petros.bibernate.config.AppConfig.initializeDataSource;
 
-public class Bibernate {
-    public static void main(String[] args) throws LiquibaseException, SQLException {
+public class DemoApp {
+    public static void main(String[] args) throws SQLException, LiquibaseException {
         DataSource dataSource = initializeDataSource();
 
         fillTestData(dataSource);
