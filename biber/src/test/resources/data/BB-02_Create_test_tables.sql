@@ -1,13 +1,13 @@
 -- liquibase formatted sql
 -- changeset OleksiiSkachkov:BB-02_Create_test_tables
 
-create table users (
+create table if not exists users (
     id bigint primary key,
     name varchar(50),
     email varchar(50)
 );
 
-create table addresses (
+create table if not exists addresses (
     id bigint primary key,
     city varchar(50),
     street varchar(50)
@@ -22,21 +22,21 @@ create table if not exists orders (
    CONSTRAINT FK_orders_addresses FOREIGN KEY (address_id) REFERENCES addresses
 );
 
-create table cards (
+create table if not exists cards (
     id bigint primary key,
     number varchar(50) not null,
     type varchar(50) not null,
     user_id bigint unique references users
 );
 
-create table buyers (
+create table if not exists buyers (
     id bigint,
     name varchar(50) not null,
     phone varchar(50) not null,
     CONSTRAINT PK_buyers PRIMARY KEY (id)
 );
 
-create table buyers_users (
+create table if not exists buyers_users (
     buyer_id bigint REFERENCES buyers,
     user_id bigint REFERENCES users,
     CONSTRAINT PK_buyers_users PRIMARY KEY (buyer_id, user_id),
