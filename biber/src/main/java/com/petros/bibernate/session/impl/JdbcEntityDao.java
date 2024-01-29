@@ -4,10 +4,10 @@ import com.petros.bibernate.annotation.JoinTable;
 import com.petros.bibernate.annotation.ManyToMany;
 import com.petros.bibernate.collection.LazyList;
 import com.petros.bibernate.collection.LazySet;
+import com.petros.bibernate.datasource.DataSourceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
-import javax.sql.DataSource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -25,7 +25,7 @@ public class JdbcEntityDao {
 
     private final String SELECT_FROM_TABLE_BY_COLUMN = "select * from %s where %s = ?;";
 
-    private final DataSource dataSource;
+    private final DataSourceImpl dataSource;
 
     @SneakyThrows
     public <T> T findById(Class<T> entityType, Object id) {

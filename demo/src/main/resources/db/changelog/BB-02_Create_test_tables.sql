@@ -22,7 +22,7 @@ create table if not exists orders (
     CONSTRAINT FK_orders_addresses FOREIGN KEY (address_id) REFERENCES addresses
 );
 
-create table cards (
+create table if not exists cards (
     id bigint,
     number varchar(50) not null,
     type varchar(50) not null,
@@ -47,16 +47,54 @@ create table if not exists buyers_users (
     CONSTRAINT FK_buyers_users_users FOREIGN KEY (user_id) REFERENCES users
 );
 
-INSERT INTO users(id, name, email) VALUES ('1', 'Ken', 'ken@gmail.com');
-INSERT INTO users(id, name, email) VALUES ('2', 'John', 'john@gmail.com');
-INSERT INTO users(id, name, email) VALUES ('3', 'Helga', 'helga@gmail.com');
-INSERT INTO addresses(id, city, street) VALUES ('10', 'Riga', 'Rebenstrasse');
-INSERT INTO addresses(id, city, street) VALUES ('11', 'Odessa', 'R.Luksemburg');
-INSERT INTO addresses(id, city, street) VALUES ('12', 'Lviv', 'Centralnaya');
-INSERT INTO orders(id, name, price, address_id) VALUES ('1', 'Pencil', 1.01, '10');
-INSERT INTO orders(id, name, price, address_id) VALUES ('2', 'Pen', 1.02, '10');
-INSERT INTO orders(id, name, price, address_id) VALUES ('3', 'Book', 1.03, '10');
-INSERT INTO cards(id, number, type, user_id) VALUES ('1', '2386', 'visa', '1');
-INSERT INTO buyers(id, name, phone) VALUES ('1', 'Alex', '380665624786');
-INSERT INTO buyers_users(buyer_id, user_id) VALUES ('1', '1');
-INSERT INTO buyers_users(buyer_id, user_id) VALUES ('1', '2');
+INSERT INTO users (id, name, email)
+SELECT '1', 'Ken', 'ken@gmail.com'
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE id = '1');
+
+INSERT INTO users (id, name, email)
+SELECT '2', 'John', 'john@gmail.com'
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE id = '2');
+
+INSERT INTO users (id, name, email)
+SELECT '3', 'Helga', 'helga@gmail.com'
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE id = '3');
+
+INSERT INTO addresses (id, city, street)
+SELECT '10', 'Riga', 'Rebenstrasse'
+WHERE NOT EXISTS (SELECT 1 FROM addresses WHERE id = '10');
+
+INSERT INTO addresses (id, city, street)
+SELECT '11', 'Odessa', 'R.Luksemburg'
+WHERE NOT EXISTS (SELECT 1 FROM addresses WHERE id = '11');
+
+INSERT INTO addresses (id, city, street)
+SELECT '12', 'Lviv', 'Centralnaya'
+WHERE NOT EXISTS (SELECT 1 FROM addresses WHERE id = '12');
+
+INSERT INTO orders (id, name, price, address_id)
+SELECT '1', 'Pencil', 1.01, '10'
+WHERE NOT EXISTS (SELECT 1 FROM orders WHERE id = '1');
+
+INSERT INTO orders (id, name, price, address_id)
+SELECT '2', 'Pen', 1.02, '10'
+WHERE NOT EXISTS (SELECT 1 FROM orders WHERE id = '2');
+
+INSERT INTO orders (id, name, price, address_id)
+SELECT '3', 'Book', 1.03, '10'
+WHERE NOT EXISTS (SELECT 1 FROM orders WHERE id = '3');
+
+INSERT INTO cards (id, number, type, user_id)
+SELECT '1', '2386', 'visa', '1'
+WHERE NOT EXISTS (SELECT 1 FROM cards WHERE id = '1');
+
+INSERT INTO buyers (id, name, phone)
+SELECT '1', 'Alex', '380665624786'
+WHERE NOT EXISTS (SELECT 1 FROM buyers WHERE id = '1');
+
+INSERT INTO buyers_users (buyer_id, user_id)
+SELECT '1', '1'
+WHERE NOT EXISTS (SELECT 1 FROM buyers_users WHERE buyer_id = '1' AND user_id = '1');
+
+INSERT INTO buyers_users (buyer_id, user_id)
+SELECT '1', '2'
+WHERE NOT EXISTS (SELECT 1 FROM buyers_users WHERE buyer_id = '1' AND user_id = '2');
