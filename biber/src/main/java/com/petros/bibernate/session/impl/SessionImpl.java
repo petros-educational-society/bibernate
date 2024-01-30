@@ -1,15 +1,15 @@
 package com.petros.bibernate.session.impl;
 
+import com.petros.bibernate.datasource.DataSourceImpl;
 import com.petros.bibernate.session.Session;
 import lombok.SneakyThrows;
 
-import javax.sql.DataSource;
 
 public class SessionImpl implements Session {
 
     private final JdbcEntityDao jdbcEntityDao;
 
-    public SessionImpl(DataSource dataSource) {
+    public SessionImpl(DataSourceImpl dataSource) {
         this.jdbcEntityDao = new JdbcEntityDao(dataSource);
     }
 
