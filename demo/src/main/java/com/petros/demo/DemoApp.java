@@ -21,7 +21,7 @@ import java.sql.SQLException;
 
 public class DemoApp {
     public static void main(String[] args) throws SQLException, LiquibaseException {
-        try (DataSourceImpl customDataSource = new DataSourceImpl("jdbc:postgresql://localhost:5432/bibernate", "postgres", "root")) {
+        try (DataSourceImpl customDataSource = new DataSourceImpl("jdbc:postgresql://localhost:5434/bibernate", "postgres", "root")) {
             try (Connection connection = customDataSource.getConnection()) {
                 fillTestData(connection);
                 testing(customDataSource);
