@@ -4,13 +4,12 @@ import com.petros.bibernate.datasource.DataSourceImpl;
 import com.petros.bibernate.session.Session;
 import lombok.SneakyThrows;
 
-
-public class SessionImpl implements Session {
-
+public class SessionImpl
+        implements Session {
     private final JdbcEntityDao jdbcEntityDao;
 
     public SessionImpl(DataSourceImpl dataSource) {
-        this.jdbcEntityDao = new JdbcEntityDao(dataSource);
+        this.jdbcEntityDao = new JdbcEntityDao(dataSource, new StatefulPersistenceContext());
     }
 
     @Override
@@ -18,4 +17,5 @@ public class SessionImpl implements Session {
     public <T> T find(Class<T> entityType, Object id) {
         return jdbcEntityDao.findById(entityType, id);
     }
+
 }
