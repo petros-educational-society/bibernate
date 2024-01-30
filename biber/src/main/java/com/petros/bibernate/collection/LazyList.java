@@ -1,12 +1,22 @@
 package com.petros.bibernate.collection;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-public class LazyList<T> implements List<T>{
+public class LazyList<T>
+        implements List<T> {
 
-    private Supplier<List<T>> collectionSupplier;
+    private final Supplier<List<T>> collectionSupplier;
     private List<T> internalList;
 
     public LazyList(Supplier<List<T>> collectionSupplier) {
@@ -71,8 +81,10 @@ public class LazyList<T> implements List<T>{
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends T> c) {
-        return getInternalList().addAll(index, c);
+    public boolean addAll(int index,
+                          Collection<? extends T> c) {
+        return getInternalList().addAll(index,
+                                        c);
     }
 
     @Override
@@ -116,13 +128,17 @@ public class LazyList<T> implements List<T>{
     }
 
     @Override
-    public T set(int index, T element) {
-        return getInternalList().set(index, element);
+    public T set(int index,
+                 T element) {
+        return getInternalList().set(index,
+                                     element);
     }
 
     @Override
-    public void add(int index, T element) {
-        getInternalList().add(index, element);
+    public void add(int index,
+                    T element) {
+        getInternalList().add(index,
+                              element);
     }
 
     @Override
@@ -151,8 +167,10 @@ public class LazyList<T> implements List<T>{
     }
 
     @Override
-    public List<T> subList(int fromIndex, int toIndex) {
-        return getInternalList().subList(fromIndex, toIndex);
+    public List<T> subList(int fromIndex,
+                           int toIndex) {
+        return getInternalList().subList(fromIndex,
+                                         toIndex);
     }
 
     @Override
@@ -195,50 +213,6 @@ public class LazyList<T> implements List<T>{
         return getInternalList().reversed();
     }
 
-    public static <E> List<E> of() {
-        return List.of();
-    }
-
-    public static <E> List<E> of(E e1) {
-        return List.of(e1);
-    }
-
-    public static <E> List<E> of(E e1, E e2) {
-        return List.of(e1, e2);
-    }
-
-    public static <E> List<E> of(E e1, E e2, E e3) {
-        return List.of(e1, e2, e3);
-    }
-
-    public static <E> List<E> of(E e1, E e2, E e3, E e4) {
-        return List.of(e1, e2, e3, e4);
-    }
-
-    public static <E> List<E> of(E e1, E e2, E e3, E e4, E e5) {
-        return List.of(e1, e2, e3, e4, e5);
-    }
-
-    public static <E> List<E> of(E e1, E e2, E e3, E e4, E e5, E e6) {
-        return List.of(e1, e2, e3, e4, e5, e6);
-    }
-
-    public static <E> List<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7) {
-        return List.of(e1, e2, e3, e4, e5, e6, e7);
-    }
-
-    public static <E> List<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8) {
-        return List.of(e1, e2, e3, e4, e5, e6, e7, e8);
-    }
-
-    public static <E> List<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8, E e9) {
-        return List.of(e1, e2, e3, e4, e5, e6, e7, e8, e9);
-    }
-
-    public static <E> List<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8, E e9, E e10) {
-        return List.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10);
-    }
-
     @SafeVarargs
     public static <E> List<E> of(E... elements) {
         return List.of(elements);
@@ -272,4 +246,5 @@ public class LazyList<T> implements List<T>{
     public void forEach(Consumer<? super T> action) {
         getInternalList().forEach(action);
     }
+
 }
