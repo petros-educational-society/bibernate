@@ -4,11 +4,11 @@ import com.petros.bibernate.annotation.JoinTable;
 import com.petros.bibernate.annotation.ManyToMany;
 import com.petros.bibernate.collection.LazyList;
 import com.petros.bibernate.collection.LazySet;
+import com.petros.bibernate.datasource.DataSourceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
-import javax.sql.DataSource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -29,7 +29,7 @@ public class JdbcEntityDao {
     public final String UPDATE_TABLE_SET_VALUES_BY_COLUMN_TEMPLATE = "update %s set %s where %s";
     public final String DELETE_FROM_TABLE_BY_COLUMN = "delete from %s where %s = ?";
 
-    private final DataSource dataSource;
+    private final DataSourceImpl dataSource;
 
     @SneakyThrows
     public <T> T findById(Class<T> entityType, Object id) {
