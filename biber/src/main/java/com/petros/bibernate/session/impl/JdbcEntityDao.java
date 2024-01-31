@@ -6,6 +6,7 @@ import com.petros.bibernate.collection.LazyList;
 import com.petros.bibernate.collection.LazySet;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Constructor;
@@ -19,11 +20,14 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static com.petros.bibernate.session.util.EntityUtil.*;
-
+@Log4j2
 @RequiredArgsConstructor
 public class JdbcEntityDao {
 
-    private final String SELECT_FROM_TABLE_BY_COLUMN = "select * from %s where %s = ?;";
+    private final String SELECT_FROM_TABLE_BY_COLUMN = "select * from %s where %s = ?";
+    public final String INSERT_INTO_TABLE_VALUES_TEMPLATE = "insert into %s(%s) values(%s)";
+    public final String UPDATE_TABLE_SET_VALUES_BY_COLUMN_TEMPLATE = "update %s set %s where %s";
+    public final String DELETE_FROM_TABLE_BY_COLUMN = "delete from %s where %s = ?";
 
     private final DataSource dataSource;
 
@@ -153,5 +157,83 @@ public class JdbcEntityDao {
         ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
         Type typeArgument = parameterizedType.getActualTypeArguments()[0];
         return (Class<?>) typeArgument;
+    }
+
+    @SneakyThrows
+    public <T> T insert(T entity) {
+        log.trace("Inserting entity {}", entity);
+        var entityType = entity.getClass();
+        try (Connection connection = dataSource.getConnection()) {
+            String tableName = resolveTableName(entityType);
+            String columns = commaSeparatedInsertableColumns(entityType);
+            String params = commaSeparatedInsertableParams(entityType);
+            String insertQuery = String.format(INSERT_INTO_TABLE_VALUES_TEMPLATE, tableName, columns, params);
+            try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+                fillInsertStatementParams(insertStatement, entity);
+                log.debug("SQL: {}", insertStatement);
+                insertStatement.executeUpdate();
+            }
+        }
+        return entity;
+    }
+
+    @SneakyThrows
+    public <T> T update(T entity) {
+        log.trace("Updating entity {}", entity);
+        var entityType = entity.getClass();
+        try (Connection connection = dataSource.getConnection()) {
+            String tableName = resolveTableName(entityType);
+            String updatableColumns = commaSeparatedUpdatableColumnSetters(entityType);
+            String idColumn = resolveIdColumnName(entityType) + " = ?";
+            var updateQuery = String.format(UPDATE_TABLE_SET_VALUES_BY_COLUMN_TEMPLATE, tableName, updatableColumns, idColumn);
+            try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+                fillUpdateStatementParams(updateStatement, entity);
+                int idParamIndex = getUpdatableFields(entityType).length + 1;
+                updateStatement.setObject(idParamIndex, getId(entity));
+                log.debug("SQL: " + updateStatement);
+                updateStatement.executeUpdate();
+            }
+        }
+        return entity;
+    }
+
+    @SneakyThrows
+    public <T> T delete(T entity) {
+        log.trace("Deleting entity {}", entity);
+        var entityType = entity.getClass();
+        try (Connection connection = dataSource.getConnection()) {
+            String tableName = resolveTableName(entityType);
+            String idColumnName = resolveIdColumnName(entityType);
+            var deleteQuery = String.format(DELETE_FROM_TABLE_BY_COLUMN, tableName, idColumnName);
+            try (PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
+                Object id = getId(entity);
+                deleteStatement.setObject(1, id);
+                log.debug("SQL: " + deleteStatement);
+                deleteStatement.executeUpdate();
+            }
+        }
+        return entity;
+    }
+
+    @SneakyThrows
+    private <T> void fillInsertStatementParams(PreparedStatement insertStatement, T entity) {
+        Field[] insertableFields = getInsertableFields(entity.getClass());
+        setParamsFromFields(insertStatement, entity, insertableFields);
+    }
+
+    @SneakyThrows
+    private <T> void fillUpdateStatementParams(PreparedStatement updateStatement, T entity) {
+        Field[] updatableFields = getUpdatableFields(entity.getClass());
+        setParamsFromFields(updateStatement, entity, updatableFields);
+    }
+
+    @SneakyThrows
+    private void setParamsFromFields(PreparedStatement statement, Object entity, Field[] fields) {
+        for (int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
+            field.setAccessible(true);
+            var columnValue = field.get(entity);
+            statement.setObject(i + 1, columnValue);
+        }
     }
 }
