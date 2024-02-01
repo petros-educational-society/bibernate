@@ -4,8 +4,8 @@ import com.petros.bibernate.annotation.Entity;
 import com.petros.bibernate.annotation.Id;
 import com.petros.bibernate.annotation.OneToMany;
 import com.petros.bibernate.annotation.Table;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import java.util.List;
 @Entity
 @Table("addresses")
 @ToString(exclude = "orders")
+@NoArgsConstructor
 public class Address {
     @Id
     private Long id;
@@ -28,5 +29,15 @@ public class Address {
         this.id = id;
         this.city = city;
         this.street = street;
+    }
+
+    public void addOrder(Order order) {
+        orders.add(order);
+        order.setAddress(this);
+    }
+
+    public void removeOrder(Order order) {
+        orders.remove(order);
+        order.setAddress(null);
     }
 }

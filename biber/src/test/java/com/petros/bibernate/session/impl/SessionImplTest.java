@@ -11,7 +11,6 @@ import org.junit.jupiter.api.TestInstance;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -113,10 +112,34 @@ class SessionImplTest {
     }
 
     @Test
-    void createAddress() {
+    void createOrderWithAddress() {
         Address address = new Address(13L, "Kiev", "Shevchenka");
-//        Order order = new Order("paper", BigDecimal.valueOf(1.04), address);
-        Address result = session.insert(address);
-        assertTrue(Objects.nonNull(result.getId()));
+        Order order = new Order(4L, "Paper", BigDecimal.valueOf(1.04), address);
+        address.addOrder(order);
+        session.insert(order);
+        session.close();
+        Order createdOrder = session.find(Order.class, 4L);
+
+        assertEquals(4L, createdOrder.getId());
+        assertEquals("Paper", createdOrder.getName());
+        assertEquals(BigDecimal.valueOf(1.04), createdOrder.getPrice());
+
+        assertEquals(13L, createdOrder.getAddress().getId());
+
+        Address createdAddress = session.find(Address.class, 13L);
+        assertEquals(address.getCity(), createdAddress.getCity());
+        assertEquals(address.getStreet(), createdAddress.getStreet());
+    }
+
+    @Test
+    void createOrderWithoutAddress() {
+        Order order = new Order(5L, "Paper", BigDecimal.valueOf(1.05), null);
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> {
+                    session.insert(order);
+                    session.close();
+                });
+        assertEquals("class com.petros.bibernate.entity.Address is mandatory field for entity class com.petros.bibernate.entity.Order",
+                exception.getMessage());
     }
 }

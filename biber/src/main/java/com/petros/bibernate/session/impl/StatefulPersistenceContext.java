@@ -51,4 +51,8 @@ public class StatefulPersistenceContext
                   .cast(entitiesByKey.remove(key));
     }
 
+    public void clear() {
+        entitiesByKey.clear();
+    }
+
 }

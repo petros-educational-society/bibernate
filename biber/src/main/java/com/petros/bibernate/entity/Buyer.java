@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.petros.bibernate.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import java.util.Set;
 @Table("buyers")
 @ToString(exclude = "users")
 @EqualsAndHashCode(exclude = "users")
+@NoArgsConstructor
 public class Buyer {
     @Id
     private Long id;

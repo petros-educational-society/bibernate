@@ -41,4 +41,6 @@ public interface PersistenceContext {
      */
     <T> T removeEntity(EntityKey<T> key);
 
+    void clear();
+
 }

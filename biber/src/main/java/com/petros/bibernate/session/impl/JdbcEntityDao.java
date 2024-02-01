@@ -171,13 +171,14 @@ public class JdbcEntityDao {
     public <T> T insert(T entity) {
         log.trace("Inserting entity {}", entity);
         var entityType = entity.getClass();
+        Map<Field, Object> idByField = getEntityIdsOfNoRegularFieldsIfExist(entity, entityType);
         try (Connection connection = dataSource.getConnection()) {
             String tableName = resolveTableName(entityType);
             String columns = commaSeparatedInsertableColumns(entityType);
             String params = commaSeparatedInsertableParams(entityType);
             String insertQuery = String.format(INSERT_INTO_TABLE_VALUES_TEMPLATE, tableName, columns, params);
             try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
-                fillInsertStatementParams(insertStatement, entity);
+                fillInsertStatementParams(insertStatement, entity, idByField);
                 log.debug("SQL: {}", insertStatement);
                 insertStatement.executeUpdate();
             }
@@ -185,17 +186,37 @@ public class JdbcEntityDao {
         return entity;
     }
 
+    private <T> Map<Field, Object> getEntityIdsOfNoRegularFieldsIfExist(T entity, Class<?> entityType) throws IllegalAccessException {
+        List<Field> fieldsWithEntityType = Arrays.stream(getInsertableFields(entityType)).filter(f -> !isRegularField(f)).toList();
+        Map<Field, Object> idByField = null;
+        if (!fieldsWithEntityType.isEmpty()) {
+            idByField = new HashMap<>();
+            for (var field: fieldsWithEntityType) {
+                field.setAccessible(true);
+                Object columnValue = field.get(entity);
+                if (Objects.isNull(columnValue)) {
+                    throw new IllegalArgumentException("%s is mandatory field for entity %s".formatted(field.getType(), entityType));
+                }
+                Object result = insert(columnValue);
+                Object id = getId(result);
+                idByField.put(field, id);
+            }
+        }
+        return idByField;
+    }
+
     @SneakyThrows
     public <T> T update(T entity) {
         log.trace("Updating entity {}", entity);
         var entityType = entity.getClass();
+        Map<Field, Object> idByField = getEntityIdsOfNoRegularFieldsIfExist(entity, entityType);
         try (Connection connection = dataSource.getConnection()) {
             String tableName = resolveTableName(entityType);
             String updatableColumns = commaSeparatedUpdatableColumnSetters(entityType);
             String idColumn = resolveIdColumnName(entityType) + " = ?";
             var updateQuery = String.format(UPDATE_TABLE_SET_VALUES_BY_COLUMN_TEMPLATE, tableName, updatableColumns, idColumn);
             try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
-                fillUpdateStatementParams(updateStatement, entity);
+                fillUpdateStatementParams(updateStatement, entity, idByField);
                 int idParamIndex = getUpdatableFields(entityType).length + 1;
                 updateStatement.setObject(idParamIndex, getId(entity));
                 log.debug("SQL: " + updateStatement);
@@ -224,23 +245,23 @@ public class JdbcEntityDao {
     }
 
     @SneakyThrows
-    private <T> void fillInsertStatementParams(PreparedStatement insertStatement, T entity) {
+    private <T> void fillInsertStatementParams(PreparedStatement insertStatement, T entity, Map<Field, Object> idByField) {
         Field[] insertableFields = getInsertableFields(entity.getClass());
-        setParamsFromFields(insertStatement, entity, insertableFields);
+        setParamsFromFields(insertStatement, entity, insertableFields, idByField);
     }
 
     @SneakyThrows
-    private <T> void fillUpdateStatementParams(PreparedStatement updateStatement, T entity) {
+    private <T> void fillUpdateStatementParams(PreparedStatement updateStatement, T entity, Map<Field, Object> idByField) {
         Field[] updatableFields = getUpdatableFields(entity.getClass());
-        setParamsFromFields(updateStatement, entity, updatableFields);
+        setParamsFromFields(updateStatement, entity, updatableFields, idByField);
     }
 
     @SneakyThrows
-    private void setParamsFromFields(PreparedStatement statement, Object entity, Field[] fields) {
+    private void setParamsFromFields(PreparedStatement statement, Object entity, Field[] fields, Map<Field, Object> idByField) {
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             field.setAccessible(true);
-            var columnValue = field.get(entity);
+            var columnValue = isRegularField(field) ? field.get(entity) : idByField.get(field);
             statement.setObject(i + 1, columnValue);
         }
     }
