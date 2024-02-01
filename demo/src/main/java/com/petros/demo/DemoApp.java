@@ -19,7 +19,6 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Objects;
 
 
 public class DemoApp {
@@ -35,10 +34,10 @@ public class DemoApp {
     private static void testing(DataSourceImpl dataSource) {
         SessionFactory sessionFactory = new SessionFactoryImpl(dataSource);
         Session session = sessionFactory.openSession();
-//        User user = session.find(User.class, 2);
-//        Address address = session.find(Address.class, 12);
-//        System.out.println(user);
-//        System.out.println(address);
+        User user = session.find(User.class, 2);
+        Address address = session.find(Address.class, 12);
+        System.out.println(user);
+        System.out.println(address);
         Address address1 = new Address(13L, "Kiev", "Shevchenka");
         Order order = new Order(4L, "Paper", BigDecimal.valueOf(1.04), address1);
         address1.addOrder(order);
