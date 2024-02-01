@@ -3,12 +3,15 @@ package com.petros.bibernate.session.impl;
 import com.petros.bibernate.datasource.DataSourceImpl;
 import com.petros.bibernate.entity.*;
 import com.petros.bibernate.session.Session;
+import lombok.RequiredArgsConstructor;
 import org.h2.jdbc.JdbcSQLNonTransientException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@RequiredArgsConstructor
 class SessionImplTest {
 
     private static final String DB_URL = "jdbc:h2:mem:db;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM 'classpath:data/BB-02_Create_test_tables.sql';";
@@ -106,5 +110,13 @@ class SessionImplTest {
         Buyer buyer = session.find(Buyer.class, 1);
         Set<User> users = buyer.getUsers();
         assertEquals(2, users.size());
+    }
+
+    @Test
+    void createAddress() {
+        Address address = new Address(13L, "Kiev", "Shevchenka");
+//        Order order = new Order("paper", BigDecimal.valueOf(1.04), address);
+        Address result = session.insert(address);
+        assertTrue(Objects.nonNull(result.getId()));
     }
 }

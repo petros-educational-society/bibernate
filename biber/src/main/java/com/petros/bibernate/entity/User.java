@@ -24,4 +24,9 @@ public class User {
     @JsonIgnore
     @ManyToMany(mappedBy = "buyers")
     private Set<Buyer> buyers = new HashSet<>();
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }

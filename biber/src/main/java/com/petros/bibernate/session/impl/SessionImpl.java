@@ -18,4 +18,10 @@ public class SessionImpl implements Session {
     public <T> T find(Class<T> entityType, Object id) {
         return jdbcEntityDao.findById(entityType, id);
     }
+
+    @Override
+    @SneakyThrows
+    public <T> T insert(T entity) {
+        return jdbcEntityDao.insert(entity);
+    }
 }

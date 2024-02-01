@@ -4,6 +4,7 @@ import com.petros.bibernate.annotation.Entity;
 import com.petros.bibernate.annotation.Id;
 import com.petros.bibernate.annotation.OneToMany;
 import com.petros.bibernate.annotation.Table;
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
@@ -22,4 +23,10 @@ public class Address {
 
     @OneToMany
     private List<Order> orders = new ArrayList<>();
+
+    public Address(Long id, String city, String street) {
+        this.id = id;
+        this.city = city;
+        this.street = street;
+    }
 }
