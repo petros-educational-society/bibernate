@@ -10,7 +10,7 @@ public class SessionImpl implements Session {
     private final JdbcEntityDao jdbcEntityDao;
 
     public SessionImpl(DataSourceImpl dataSource) {
-        this.jdbcEntityDao = new JdbcEntityDao(dataSource);
+        this.jdbcEntityDao = new JdbcEntityDao(dataSource, new StatefulPersistenceContext());
     }
 
     @Override

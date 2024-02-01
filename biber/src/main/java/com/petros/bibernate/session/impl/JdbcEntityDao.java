@@ -5,6 +5,8 @@ import com.petros.bibernate.annotation.ManyToMany;
 import com.petros.bibernate.collection.LazyList;
 import com.petros.bibernate.collection.LazySet;
 import com.petros.bibernate.datasource.DataSourceImpl;
+import com.petros.bibernate.session.PersistenceContext;
+import com.petros.bibernate.session.util.EntityKey;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -30,10 +32,16 @@ public class JdbcEntityDao {
     public final String DELETE_FROM_TABLE_BY_COLUMN = "delete from %s where %s = ?";
 
     private final DataSourceImpl dataSource;
+    private final PersistenceContext persistenceContext;
 
     @SneakyThrows
     public <T> T findById(Class<T> entityType, Object id) {
         Field idField = getIdField(entityType);
+        var cachedEntity = persistenceContext.getEntity(new EntityKey<T>(entityType, id));
+        if (cachedEntity != null) {
+            log.trace("Returning cached entity from the context {}", cachedEntity);
+            return entityType.cast(cachedEntity);
+        }
         return findOneBy(entityType, idField, id);
     }
 
@@ -88,7 +96,7 @@ public class JdbcEntityDao {
 
             }
         }
-        return entity;
+        return persistenceContext.addEntity(entity);
     }
 
     private <T> void resolveEntityCollectionValue(Class<T> entityType, T entity, Field field) throws IllegalAccessException {
