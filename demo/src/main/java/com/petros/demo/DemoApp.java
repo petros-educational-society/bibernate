@@ -2,6 +2,7 @@ package com.petros.demo;
 
 import com.petros.bibernate.datasource.DataSourceImpl;
 import com.petros.bibernate.entity.Address;
+import com.petros.bibernate.entity.Order;
 import com.petros.bibernate.entity.User;
 import com.petros.bibernate.session.Session;
 import com.petros.bibernate.session.SessionFactory;
@@ -15,6 +16,7 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -36,6 +38,13 @@ public class DemoApp {
         Address address = session.find(Address.class, 12);
         System.out.println(user);
         System.out.println(address);
+        Address address1 = new Address(13L, "Kiev", "Shevchenka");
+        Order order = new Order(4L, "Paper", BigDecimal.valueOf(1.04), address1);
+        address1.addOrder(order);
+        session.insert(order);
+        session.close();
+        Order result = session.find(Order.class, 4L);
+        System.out.println(result);
     }
 
     public static void fillTestData(Connection connection) throws LiquibaseException {

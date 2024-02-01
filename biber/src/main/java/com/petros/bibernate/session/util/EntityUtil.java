@@ -5,6 +5,8 @@ import com.petros.bibernate.annotation.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class EntityUtil {
 
@@ -15,6 +17,11 @@ public class EntityUtil {
                         () -> Optional.ofNullable(field.getAnnotation(JoinColumn.class))
                         .map(JoinColumn::value)
                                 .orElse(field.getName()));
+    }
+
+    public static String resolveIdColumnName(Class<?> entityType) {
+        var field = getIdField(entityType);
+        return resolveColumnName(field);
     }
 
     public static  <T> String resolveTableName(Class<T> entityType) {
@@ -74,5 +81,50 @@ public class EntityUtil {
 
     public static boolean isManyToManyEntityField(Field field) {
         return field.isAnnotationPresent(ManyToMany.class);
+    }
+
+    public static String commaSeparatedInsertableColumns(Class<?> entityType) {
+        var insertableFields = getInsertableFields(entityType);
+        return Arrays.stream(insertableFields)
+                .map(EntityUtil::resolveColumnName)
+                .collect(Collectors.joining(", "));
+    }
+
+    public static String commaSeparatedInsertableParams(Class<?> entityType) {
+        var insertableFields = getInsertableFields(entityType);
+        return Arrays.stream(insertableFields)
+                .map(f -> "?")
+                .collect(Collectors.joining(","));
+    }
+
+    public static String commaSeparatedUpdatableColumnSetters(Class<?> entityType) {
+        var updatableFields = getUpdatableFields(entityType);
+        return Arrays.stream(updatableFields)
+                .map(EntityUtil::resolveColumnName)
+                .map(column -> column + " = ?")
+                .collect(Collectors.joining(", "));
+    }
+
+    public static Field[] getInsertableFields(Class<?> entityType) {
+        return getFields(entityType, EntityUtil::isColumnField);
+    }
+
+    public static Field[] getUpdatableFields(Class<?> entityType) {
+        Predicate<Field> updatableFieldPredicate = f -> isColumnField(f) && !isIdField(f);
+        return getFields(entityType, updatableFieldPredicate);
+    }
+
+    public static Field[] getFields(Class<?> entityType, Predicate<Field> fieldPredicate) {
+        return Arrays.stream(entityType.getDeclaredFields())
+                .filter(fieldPredicate)
+                .toArray(Field[]::new);
+    }
+
+    public static boolean isColumnField(Field field) {
+        return !field.isAnnotationPresent(OneToMany.class);
+    }
+
+    public static boolean isIdField(Field field) {
+        return field.isAnnotationPresent(Id.class);
     }
 }

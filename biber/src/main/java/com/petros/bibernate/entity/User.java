@@ -6,6 +6,7 @@ import com.petros.bibernate.annotation.Id;
 import com.petros.bibernate.annotation.ManyToMany;
 import com.petros.bibernate.annotation.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.Set;
 @Entity
 @Table("users")
 @ToString(exclude = "buyers")
+@NoArgsConstructor
 public class User {
     @Id
     private Long id;
@@ -24,4 +26,9 @@ public class User {
     @JsonIgnore
     @ManyToMany(mappedBy = "buyers")
     private Set<Buyer> buyers = new HashSet<>();
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }

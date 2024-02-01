@@ -3,11 +3,13 @@ package com.petros.bibernate.session.impl;
 import com.petros.bibernate.datasource.DataSourceImpl;
 import com.petros.bibernate.entity.*;
 import com.petros.bibernate.session.Session;
+import lombok.RequiredArgsConstructor;
 import org.h2.jdbc.JdbcSQLNonTransientException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@RequiredArgsConstructor
 class SessionImplTest {
 
     private static final String DB_URL = "jdbc:h2:mem:db;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM 'classpath:data/BB-02_Create_test_tables.sql';";
@@ -106,5 +109,37 @@ class SessionImplTest {
         Buyer buyer = session.find(Buyer.class, 1);
         Set<User> users = buyer.getUsers();
         assertEquals(2, users.size());
+    }
+
+    @Test
+    void createOrderWithAddress() {
+        Address address = new Address(13L, "Kiev", "Shevchenka");
+        Order order = new Order(4L, "Paper", BigDecimal.valueOf(1.04), address);
+        address.addOrder(order);
+        session.insert(order);
+        session.close();
+        Order createdOrder = session.find(Order.class, 4L);
+
+        assertEquals(4L, createdOrder.getId());
+        assertEquals("Paper", createdOrder.getName());
+        assertEquals(BigDecimal.valueOf(1.04), createdOrder.getPrice());
+
+        assertEquals(13L, createdOrder.getAddress().getId());
+
+        Address createdAddress = session.find(Address.class, 13L);
+        assertEquals(address.getCity(), createdAddress.getCity());
+        assertEquals(address.getStreet(), createdAddress.getStreet());
+    }
+
+    @Test
+    void createOrderWithoutAddress() {
+        Order order = new Order(5L, "Paper", BigDecimal.valueOf(1.05), null);
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> {
+                    session.insert(order);
+                    session.close();
+                });
+        assertEquals("class com.petros.bibernate.entity.Address is mandatory field for entity class com.petros.bibernate.entity.Order",
+                exception.getMessage());
     }
 }

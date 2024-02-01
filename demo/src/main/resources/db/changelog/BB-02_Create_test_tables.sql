@@ -16,7 +16,7 @@ create table if not exists addresses (
 create table if not exists orders (
     id bigint,
     name varchar(50) not null,
-    price decimal not null,
+    price decimal(10, 2) not null,
     address_id bigint,
     CONSTRAINT PK_orders PRIMARY KEY (id),
     CONSTRAINT FK_orders_addresses FOREIGN KEY (address_id) REFERENCES addresses
