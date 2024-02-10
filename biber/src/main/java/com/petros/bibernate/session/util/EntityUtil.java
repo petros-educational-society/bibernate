@@ -1,6 +1,7 @@
 package com.petros.bibernate.session.util;
 
 import com.petros.bibernate.annotation.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -11,6 +12,7 @@ public class EntityUtil {
     public static String resolveColumnName(Field field) {
         return Optional.ofNullable(field.getAnnotation(Column.class))
                 .map(Column::value)
+                .filter(StringUtils::isNotBlank)
                 .orElseGet(
                         () -> Optional.ofNullable(field.getAnnotation(JoinColumn.class))
                         .map(JoinColumn::value)

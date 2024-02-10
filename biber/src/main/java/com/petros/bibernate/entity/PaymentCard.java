@@ -1,6 +1,10 @@
 package com.petros.bibernate.entity;
 
-import com.petros.bibernate.annotation.*;
+import com.petros.bibernate.annotation.Entity;
+import com.petros.bibernate.annotation.Id;
+import com.petros.bibernate.annotation.JoinColumn;
+import com.petros.bibernate.annotation.OneToOne;
+import com.petros.bibernate.annotation.Table;
 import lombok.Data;
 
 @Data
@@ -16,4 +20,5 @@ public class PaymentCard {
     @OneToOne
     @JoinColumn(value = "user_id")
     private User user;
+
 }

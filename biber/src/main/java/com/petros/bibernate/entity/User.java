@@ -1,6 +1,7 @@
 package com.petros.bibernate.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.petros.bibernate.annotation.Column;
 import com.petros.bibernate.annotation.Entity;
 import com.petros.bibernate.annotation.Id;
 import com.petros.bibernate.annotation.ManyToMany;
@@ -18,7 +19,9 @@ import java.util.Set;
 public class User {
     @Id
     private Long id;
+    @Column
     private String name;
+    @Column
     private String email;
 
     @JsonIgnore

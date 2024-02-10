@@ -1,5 +1,6 @@
 package com.petros.demo;
 
+import com.petros.bibernate.context.SimpleClassPathEntityMetamodelScanner;
 import com.petros.bibernate.datasource.DataSourceImpl;
 import com.petros.bibernate.entity.Address;
 import com.petros.bibernate.entity.User;
@@ -30,7 +31,7 @@ public class DemoApp {
     }
 
     private static void testing(DataSourceImpl dataSource) {
-        SessionFactory sessionFactory = new SessionFactoryImpl(dataSource);
+        SessionFactory sessionFactory = new SessionFactoryImpl(dataSource, new SimpleClassPathEntityMetamodelScanner());
         Session session = sessionFactory.openSession();
         User user = session.find(User.class, 2);
         Address address = session.find(Address.class, 12);

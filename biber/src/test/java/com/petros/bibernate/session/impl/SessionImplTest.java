@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestInstance;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,7 +27,8 @@ class SessionImplTest {
     @BeforeAll
     public void init() {
         try (DataSourceImpl dataSource = new DataSourceImpl(DB_URL, DB_USER, DB_PASSWORD)) {
-            session = new SessionImpl(dataSource);
+            session = new SessionImpl(dataSource,
+                                      new ConcurrentHashMap<>() );
         }
     }
 
